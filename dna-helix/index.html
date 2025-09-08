@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DNA Helix Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="dna-canvas"></canvas>
+<script>
+const canvas = document.getElementById('dna-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+function drawHelix(cx, cy, t) {
+  const len = Math.min(w, h) * 0.7;
+  const steps = 60;
+  for (let i = 0; i < steps; i++) {
+    let p = i / steps;
+    let angle = p * Math.PI * 4 + t * 0.7;
+    let x1 = cx + Math.cos(angle) * 60;
+    let y = cy + (p - 0.5) * len;
+    let x2 = cx - Math.cos(angle) * 60;
+    // Backbone
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x1, y, 8, 0, Math.PI*2);
+    ctx.arc(x2, y, 8, 0, Math.PI*2);
+    ctx.fillStyle = `hsl(${200 + 80*Math.sin(angle)}, 80%, 70%)`;
+    ctx.globalAlpha = 0.7;
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.restore();
+    // Rungs
+    if (i % 4 === 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x2, y);
+      ctx.strokeStyle = `hsl(${320 + 80*Math.cos(angle)}, 80%, 70%)`;
+      ctx.lineWidth = 4.2;
+      ctx.globalAlpha = 0.5;
+      ctx.shadowColor = '#fff';
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+function animate(t) {
+  ctx.clearRect(0, 0, w, h);
+  drawHelix(w/2, h/2, t/1000);
+  requestAnimationFrame(animate);
+}
+animate(0);
+</script>
+</body>
+</html>
