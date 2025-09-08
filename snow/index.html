@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snow Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="snow-canvas"></canvas>
+<script>
+const canvas = document.getElementById('snow-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+const snowflakes = [];
+const snowCount = Math.floor((w * h) / 1800);
+for (let i = 0; i < snowCount; i++) {
+  snowflakes.push({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: 1.5 + Math.random() * 2.5,
+    s: 0.7 + Math.random() * 1.2,
+    drift: (Math.random() - 0.5) * 0.8,
+    o: 0.5 + Math.random() * 0.5
+  });
+}
+function draw() {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#fff';
+  for (let s of snowflakes) {
+    ctx.globalAlpha = s.o;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+    s.y += s.s;
+    s.x += s.drift;
+    if (s.y > h) {
+      s.x = Math.random() * w;
+      s.y = -s.r;
+      s.r = 1.5 + Math.random() * 2.5;
+      s.s = 0.7 + Math.random() * 1.2;
+      s.drift = (Math.random() - 0.5) * 0.8;
+      s.o = 0.5 + Math.random() * 0.5;
+    }
+    if (s.x < 0) s.x = w;
+    if (s.x > w) s.x = 0;
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>

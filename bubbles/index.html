@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubbles Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="bubbles-canvas"></canvas>
+<script>
+const canvas = document.getElementById('bubbles-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+const bubbles = [];
+const bubbleCount = Math.floor((w * h) / 2200);
+for (let i = 0; i < bubbleCount; i++) {
+  bubbles.push({
+    x: Math.random() * w,
+    y: h + Math.random() * h,
+    r: 12 + Math.random() * 18,
+    s: 0.7 + Math.random() * 1.2,
+    drift: (Math.random() - 0.5) * 0.7,
+    o: 0.2 + Math.random() * 0.4,
+    hue: 180 + Math.random() * 80
+  });
+}
+function draw() {
+  ctx.clearRect(0, 0, w, h);
+  for (let b of bubbles) {
+    ctx.save();
+    ctx.globalAlpha = b.o;
+    let grad = ctx.createRadialGradient(b.x, b.y, b.r * 0.2, b.x, b.y, b.r);
+    grad.addColorStop(0, `hsla(${b.hue},70%,90%,1)`);
+    grad.addColorStop(0.7, `hsla(${b.hue},70%,60%,0.5)`);
+    grad.addColorStop(1, `hsla(${b.hue},70%,60%,0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    b.y -= b.s;
+    b.x += b.drift;
+    if (b.y < -b.r) {
+      b.x = Math.random() * w;
+      b.y = h + b.r;
+      b.r = 12 + Math.random() * 18;
+      b.s = 0.7 + Math.random() * 1.2;
+      b.drift = (Math.random() - 0.5) * 0.7;
+      b.o = 0.2 + Math.random() * 0.4;
+      b.hue = 180 + Math.random() * 80;
+    }
+    if (b.x < 0) b.x = w;
+    if (b.x > w) b.x = 0;
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
