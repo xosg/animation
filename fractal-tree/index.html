@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fractal Tree Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="tree-canvas"></canvas>
+<script>
+const canvas = document.getElementById('tree-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+function drawBranch(x, y, angle, len, depth, t) {
+  if (depth === 0 || len < 6) return;
+  const sway = Math.sin(t + depth) * 0.18;
+  const a1 = angle - (0.32 + sway * 0.5);
+  const a2 = angle + (0.32 + sway * 0.5);
+  const l1 = len * (0.72 + Math.sin(t + depth * 1.2) * 0.06);
+  const l2 = len * (0.72 + Math.cos(t + depth * 1.2) * 0.06);
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  const nx = x + Math.cos(angle) * len;
+  const ny = y + Math.sin(angle) * len;
+  ctx.lineTo(nx, ny);
+  ctx.strokeStyle = `hsl(${32 + depth*18}, 60%, ${38 + depth*6}%)`;
+  ctx.lineWidth = Math.max(1.2, depth * 1.1);
+  ctx.shadowColor = '#fff8';
+  ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.restore();
+  drawBranch(nx, ny, a1, l1, depth-1, t);
+  drawBranch(nx, ny, a2, l2, depth-1, t);
+}
+
+function animate(t) {
+  ctx.clearRect(0, 0, w, h);
+  drawBranch(w/2, h*0.98, -Math.PI/2, h*0.19, 10, t/900);
+  requestAnimationFrame(animate);
+}
+animate(0);
+</script>
+</body>
+</html>

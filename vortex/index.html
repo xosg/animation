@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vortex Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="vortex-canvas"></canvas>
+<script>
+const canvas = document.getElementById('vortex-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+function drawVortex(cx, cy, t) {
+  for (let i = 0; i < 120; i++) {
+    let angle = (i / 120) * Math.PI * 2 + t * 0.18;
+    let spiral = 18 + i * 2.1 + Math.sin(t*0.7 + i*0.2) * 8;
+    let x = cx + Math.cos(angle) * spiral;
+    let y = cy + Math.sin(angle) * spiral;
+    let alpha = 0.12 + 0.5 * (i/120);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, 7 + i*0.07, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(${120+Math.sin(i*0.1+t)*80|0},${80+Math.cos(i*0.13+t)*60|0},255,${alpha})`;
+    ctx.shadowColor = '#00eaff';
+    ctx.shadowBlur = 16;
+    ctx.fill();
+    ctx.restore();
+  }
+  // Center glow
+  ctx.save();
+  let grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60);
+  grad.addColorStop(0, '#fff');
+  grad.addColorStop(0.3, '#00eaff');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 60, 0, Math.PI*2);
+  ctx.fillStyle = grad;
+  ctx.globalAlpha = 0.7;
+  ctx.fill();
+  ctx.restore();
+}
+
+function animate(t) {
+  ctx.clearRect(0, 0, w, h);
+  drawVortex(w/2, h/2, t/1000);
+  requestAnimationFrame(animate);
+}
+animate(0);
+</script>
+</body>
+</html>
