@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurora Borealis Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #10131a; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="aurora-borealis-canvas"></canvas>
+<script>
+const canvas = document.getElementById('aurora-borealis-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+function auroraBand(y, colorStops, t, phase, amp, width) {
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+  ctx.beginPath();
+  for (let x = 0; x <= w; x += 4) {
+    let wave = Math.sin((x/180) + t*0.3 + phase) * amp * Math.sin(t*0.12 + x/400 + phase);
+    let y1 = y + wave;
+    if (x === 0) ctx.moveTo(x, y1);
+    else ctx.lineTo(x, y1);
+  }
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  let grad = ctx.createLinearGradient(0, y, w, y+amp);
+  colorStops.forEach(([stop, color]) => grad.addColorStop(stop, color));
+  ctx.fillStyle = grad;
+  ctx.shadowColor = colorStops[2][1];
+  ctx.shadowBlur = 32;
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawStars() {
+  for (let i = 0; i < 80; i++) {
+    let x = Math.random() * w;
+    let y = Math.random() * h * 0.7;
+    ctx.save();
+    ctx.globalAlpha = 0.2 + Math.random() * 0.5;
+    ctx.beginPath();
+    ctx.arc(x, y, Math.random() * 1.2 + 0.3, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function animate(t) {
+  ctx.clearRect(0, 0, w, h);
+  drawStars();
+  auroraBand(h*0.32, [[0,'#00ffe7'],[0.3,'#00ffb3'],[0.7,'#00eaff'],[1,'#00bfff']], t/1000, 0, 60, w*0.7);
+  auroraBand(h*0.38, [[0,'#aaffff'],[0.3,'#00eaff'],[0.7,'#00ffb3'],[1,'#00ffea']], t/1000, 1.2, 48, w*0.6);
+  auroraBand(h*0.45, [[0,'#b3ff00'],[0.3,'#eaff00'],[0.7,'#fffb00'],[1,'#fff700']], t/1000, 2.1, 38, w*0.5);
+  auroraBand(h*0.52, [[0,'#ff00e1'],[0.3,'#ff00b3'],[0.7,'#ff00ff'],[1,'#b300ff']], t/1000, 3.3, 32, w*0.4);
+  requestAnimationFrame(animate);
+}
+animate(0);
+</script>
+</body>
+</html>
