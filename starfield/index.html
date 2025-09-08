@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starfield Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+  <script>
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    window.addEventListener('resize', () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+    });
+
+    const STAR_COUNT = Math.floor((w * h) / 900);
+    const stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        z: Math.random() * w,
+        o: 0.2 + Math.random() * 0.8
+      });
+    }
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < STAR_COUNT; i++) {
+        let star = stars[i];
+        star.z -= 2;
+        if (star.z <= 0) {
+          star.x = Math.random() * w;
+          star.y = Math.random() * h;
+          star.z = w;
+        }
+        let k = 128.0 / star.z;
+        let sx = (star.x - w / 2) * k + w / 2;
+        let sy = (star.y - h / 2) * k + h / 2;
+        let r = Math.max(0.5, 2.5 - star.z / w * 2);
+        ctx.beginPath();
+        ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${star.o})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  </script>
+</body>
+</html>

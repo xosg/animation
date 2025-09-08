@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confetti Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #222; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    .back-link { position: absolute; top: 20px; left: 20px; color: #fff; background: #222a; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 1.1rem; z-index: 10; }
+    .back-link:hover { background: #444a; }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back-link">← Back to Home</a>
+  <canvas id="confetti"></canvas>
+  <script>
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    window.addEventListener('resize', () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+    });
+
+    const colors = ['#ff5e5b', '#f5d547', '#4ecdc4', '#ffe066', '#9d4edd', '#48bfe3', '#ffb4a2', '#b5ead7'];
+    function randomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    class Confetti {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * w;
+        this.y = -10 - Math.random() * h * 0.2;
+        this.size = 8 + Math.random() * 10;
+        this.color = randomColor();
+        this.angle = Math.random() * Math.PI * 2;
+        this.spin = (Math.random() - 0.5) * 0.2;
+        this.speed = 1.5 + Math.random() * 2.5;
+        this.sway = (Math.random() - 0.5) * 2.5;
+        this.opacity = 0.7 + Math.random() * 0.3;
+        this.shape = Math.random() > 0.5 ? 'rect' : 'circle';
+      }
+      update() {
+        this.y += this.speed;
+        this.x += Math.sin(this.angle) * this.sway;
+        this.angle += this.spin;
+        if (this.y > h + 20) this.reset();
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        if (this.shape === 'rect') {
+          ctx.fillRect(-this.size/2, -this.size/4, this.size, this.size/2);
+        } else {
+          ctx.beginPath();
+          ctx.ellipse(0, 0, this.size/2, this.size/3, 0, 0, Math.PI*2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    const confettiCount = Math.floor((w * h) / 1800);
+    let confetti = Array.from({length: confettiCount}, () => new Confetti());
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      confetti.forEach(c => {
+        c.update();
+        c.draw(ctx);
+      });
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
