@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lightning Storm Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="lightning-canvas"></canvas>
+<script>
+const canvas = document.getElementById('lightning-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+function drawBolt(x1, y1, x2, y2, segments, jaggedness, color, alpha) {
+  let points = [{x: x1, y: y1}];
+  for (let i = 1; i < segments; i++) {
+    let t = i / segments;
+    let nx = x1 + (x2 - x1) * t + (Math.random() - 0.5) * jaggedness;
+    let ny = y1 + (y2 - y1) * t + (Math.random() - 0.5) * jaggedness;
+    points.push({x: nx, y: ny});
+  }
+  points.push({x: x2, y: y2});
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let p of points) ctx.lineTo(p.x, p.y);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.6;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 18;
+  ctx.globalAlpha = alpha;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+function drawStorm(t) {
+  // Draw natural, overlapping clouds
+  let cloudCount = 18;
+  for (let i = 0; i < cloudCount; i++) {
+    let base = i / cloudCount;
+    let cx = w * (0.08 + 0.84 * base) + Math.sin(t*0.3 + i) * 32 + Math.cos(i*1.7) * 18;
+    let cy = h * (0.13 + 0.09 * Math.sin(i*0.7 + t*0.2)) + Math.cos(t*0.2 + i) * 8;
+    let r = 38 + Math.sin(i + t*0.5) * 12 + Math.cos(i*1.3 + t*0.7) * 8;
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, r * (0.9 + Math.sin(i+t)*0.2), r * (0.5 + Math.cos(i+t*0.7)*0.18), Math.sin(i+t*0.5)*0.7, 0, Math.PI*2);
+    let grad = ctx.createRadialGradient(cx, cy, r*0.2, cx, cy, r);
+    grad.addColorStop(0, 'rgba(120,130,150,0.18)');
+    grad.addColorStop(0.7, 'rgba(80,90,110,0.10)');
+    grad.addColorStop(1, 'rgba(80,90,110,0)');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 12;
+    ctx.globalAlpha = 0.7;
+    ctx.fill();
+    ctx.restore();
+  }
+  // Main lightning bolts
+  for (let i = 0; i < 3; i++) {
+    let x = w*0.2 + i*w*0.3 + Math.sin(t*0.7+i)*30;
+    let y = h*0.18 + Math.cos(t*0.5+i)*10;
+    let x2 = x + (Math.random()-0.5)*40;
+    let y2 = h*0.9;
+    drawBolt(x, y, x2, y2, 16, 32, '#fff', 0.85);
+    // Branches
+    if (Math.random() < 0.7) {
+      let bx = x2 + (Math.random()-0.5)*60;
+      let by = y2 - 60 - Math.random()*60;
+      drawBolt(x2, y2-30, bx, by, 7, 18, '#b3eaff', 0.5);
+    }
+  }
+  // Flickers
+  for (let i = 0; i < 2; i++) {
+    let x = Math.random()*w;
+    let y = h*0.18 + Math.random()*h*0.2;
+    let x2 = x + (Math.random()-0.5)*w*0.2;
+    let y2 = h*0.9;
+    drawBolt(x, y, x2, y2, 10, 24, '#b3eaff', 0.3);
+  }
+}
+
+function animate(t) {
+  ctx.clearRect(0, 0, w, h);
+  drawStorm(t/1000);
+  requestAnimationFrame(animate);
+}
+animate(0);
+</script>
+</body>
+</html>
