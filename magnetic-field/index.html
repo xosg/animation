@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magnetic Field</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="magnetic-field-canvas"></canvas>
+<script>
+const canvas = document.getElementById('magnetic-field-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+function drawField(time) {
+  ctx.clearRect(0,0,w,h);
+  let cx = w/2, cy = h/2;
+  for(let i=0; i<200; i++) {
+    let angle = (i/200)*2*Math.PI + time*0.0003;
+    let r = 180 + 60*Math.sin(6*angle + time*0.001);
+    let x = cx + r*Math.cos(angle);
+    let y = cy + r*Math.sin(angle);
+    ctx.beginPath();
+    for(let j=0; j<60; j++) {
+      let t = j/60*2*Math.PI;
+      let fx = x + 30*Math.cos(t + angle*2 + time*0.001*j);
+      let fy = y + 30*Math.sin(t + angle*2 + time*0.001*j);
+      ctx.lineTo(fx, fy);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = `hsl(${angle*57+time*0.02},100%,60%)`;
+    ctx.globalAlpha = 0.12;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+function animate(time) {
+  drawField(time);
+  requestAnimationFrame(animate);
+}
+animate(0);
+window.addEventListener('resize', () => { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; });
+</script>
+</body>
+</html>

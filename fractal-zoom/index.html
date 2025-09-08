@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fractal Zoom</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="fractal-zoom-canvas"></canvas>
+<script>
+const canvas = document.getElementById('fractal-zoom-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+function drawFractalZoom(time) {
+  const zoom = 1 + Math.sin(time * 0.0003) * 0.7;
+  const cx = -0.7, cy = 0.27015;
+  const maxIter = 80;
+  const img = ctx.createImageData(w, h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let zx = 1.5 * (x - w / 2) / (0.5 * zoom * w) + cx;
+      let zy = (y - h / 2) / (0.5 * zoom * h) + cy;
+      let i = maxIter;
+      while (zx * zx + zy * zy < 4 && i > 0) {
+        let tmp = zx * zx - zy * zy + cx;
+        zy = 2.0 * zx * zy + cy;
+        zx = tmp;
+        i--;
+      }
+      const p = (y * w + x) * 4;
+      const c = i === 0 ? 0 : 255 - Math.floor(255 * i / maxIter);
+      img.data[p] = c;
+      img.data[p+1] = c * 0.7;
+      img.data[p+2] = 255;
+      img.data[p+3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function animate(time) {
+  drawFractalZoom(time);
+  requestAnimationFrame(animate);
+}
+animate(0);
+window.addEventListener('resize', () => { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; });
+</script>
+</body>
+</html>
