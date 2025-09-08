@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glow Worms Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="glowworms-canvas"></canvas>
+<script>
+const canvas = document.getElementById('glowworms-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+const worms = [];
+const wormCount = Math.floor((w * h) / 9000) + 12;
+for (let i = 0; i < wormCount; i++) {
+  let hue = 90 + Math.random() * 180;
+  worms.push({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    vx: (Math.random() - 0.5) * 1.2,
+    vy: (Math.random() - 0.5) * 1.2,
+    hue,
+    trail: Array.from({length: 18}, () => ({x: 0, y: 0}))
+  });
+}
+function draw() {
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#181c20';
+  ctx.fillRect(0, 0, w, h);
+  ctx.globalAlpha = 1;
+  for (let worm of worms) {
+    // Move
+    worm.x += worm.vx;
+    worm.y += worm.vy;
+    if (worm.x < 0 || worm.x > w) worm.vx *= -1;
+    if (worm.y < 0 || worm.y > h) worm.vy *= -1;
+    // Random walk
+    worm.vx += (Math.random() - 0.5) * 0.18;
+    worm.vy += (Math.random() - 0.5) * 0.18;
+    worm.vx *= 0.98;
+    worm.vy *= 0.98;
+    // Trail
+    worm.trail.unshift({x: worm.x, y: worm.y});
+    if (worm.trail.length > 18) worm.trail.pop();
+    // Draw trail
+    for (let i = worm.trail.length - 1; i > 0; i--) {
+      let t = i / worm.trail.length;
+      ctx.beginPath();
+      ctx.moveTo(worm.trail[i].x, worm.trail[i].y);
+      ctx.lineTo(worm.trail[i-1].x, worm.trail[i-1].y);
+      ctx.strokeStyle = `hsla(${worm.hue},100%,70%,${0.08 + 0.22 * (1-t)})`;
+      ctx.lineWidth = 2.5 * t + 0.5;
+      ctx.shadowColor = `hsla(${worm.hue},100%,70%,1)`;
+      ctx.shadowBlur = 12 * t;
+      ctx.stroke();
+    }
+    // Draw head
+    ctx.beginPath();
+    ctx.arc(worm.x, worm.y, 4.5, 0, Math.PI*2);
+    ctx.fillStyle = `hsla(${worm.hue},100%,70%,1)`;
+    ctx.shadowColor = `hsla(${worm.hue},100%,70%,1)`;
+    ctx.shadowBlur = 18;
+    ctx.globalAlpha = 0.85;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
