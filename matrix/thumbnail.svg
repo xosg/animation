@@ -1,0 +1,13 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="#000"/>
+  <g font-family="monospace" font-size="18" font-weight="bold">
+    <text x="20" y="40" fill="#0f0" opacity="0.8">A</text>
+    <text x="40" y="60" fill="#0ff" opacity="0.7">7</text>
+    <text x="60" y="80" fill="#fff" opacity="0.9">ヲ</text>
+    <text x="80" y="100" fill="#0f0" opacity="0.8">Z</text>
+    <text x="100" y="120" fill="#0ff" opacity="0.7">9</text>
+    <text x="30" y="100" fill="#0f0" opacity="0.7">ユ</text>
+    <text x="90" y="40" fill="#fff" opacity="0.8">N</text>
+  </g>
+  <text x="50%" y="120" text-anchor="middle" font-size="18" fill="#0f0" font-family="Arial" opacity="0.7">Matrix</text>
+</svg>
