@@ -1,0 +1,21 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="#181c20"/>
+  <g>
+    <path d="M64 110 Q60 90 70 80 Q60 70 68 60 Q60 50 72 40 Q66 30 80 28 Q74 38 90 50 Q80 60 92 70 Q80 80 94 90 Q80 100 88 110 Z" fill="url(#fire1)"/>
+    <path d="M64 110 Q68 90 58 80 Q68 70 60 60 Q68 50 56 40 Q62 30 48 28 Q54 38 38 50 Q48 60 36 70 Q48 80 34 90 Q48 100 40 110 Z" fill="url(#fire2)"/>
+    <ellipse cx="64" cy="110" rx="24" ry="8" fill="#ffb300" opacity="0.18"/>
+  </g>
+  <defs>
+    <linearGradient id="fire1" x1="64" y1="110" x2="80" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb300"/>
+      <stop offset="0.5" stop-color="#ff5722"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="fire2" x1="64" y1="110" x2="48" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffd740"/>
+      <stop offset="0.5" stop-color="#ff9800"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+  </defs>
+  <text x="50%" y="120" text-anchor="middle" font-size="18" fill="#ffb300" font-family="Arial" opacity="0.7">Fire</text>
+</svg>

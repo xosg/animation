@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spiral Particles Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="spiral-canvas"></canvas>
+<script>
+const canvas = document.getElementById('spiral-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+const cx = () => w/2, cy = () => h/2;
+const N = 180;
+const particles = Array.from({length: N}, (_, i) => ({
+  angle: (i / N) * Math.PI * 8,
+  radius: 18 + i * 2.2,
+  speed: 0.012 + i * 0.00012,
+  color: `hsl(${180 + i*2}, 80%, 60%)`
+}));
+let t = 0;
+function draw() {
+  ctx.clearRect(0, 0, w, h);
+  for (let i = 0; i < N; i++) {
+    let p = particles[i];
+    let a = p.angle + t * p.speed;
+    let r = p.radius + Math.sin(t * 0.7 + i) * 8;
+    let x = cx() + Math.cos(a) * r;
+    let y = cy() + Math.sin(a) * r;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = 0.8;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+  t += 0.018;
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>

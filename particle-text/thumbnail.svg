@@ -1,0 +1,16 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="#181c20"/>
+  <g>
+    <circle cx="32" cy="64" r="3" fill="#4ecdc4"/>
+    <circle cx="40" cy="68" r="2.5" fill="#ffe066"/>
+    <circle cx="48" cy="60" r="2.8" fill="#9d4edd"/>
+    <circle cx="56" cy="66" r="2.2" fill="#4ecdc4"/>
+    <circle cx="64" cy="62" r="3.2" fill="#ffe066"/>
+    <circle cx="72" cy="68" r="2.7" fill="#9d4edd"/>
+    <circle cx="80" cy="60" r="2.5" fill="#4ecdc4"/>
+    <circle cx="88" cy="66" r="2.9" fill="#ffe066"/>
+    <circle cx="96" cy="62" r="2.3" fill="#9d4edd"/>
+    <circle cx="104" cy="68" r="2.6" fill="#4ecdc4"/>
+  </g>
+  <text x="50%" y="120" text-anchor="middle" font-size="18" fill="#4ecdc4" font-family="Arial" opacity="0.7">Particle</text>
+</svg>
