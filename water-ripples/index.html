@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Water Ripples Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="ripple-canvas"></canvas>
+<script>
+const canvas = document.getElementById('ripple-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+const ripples = [];
+function spawnRipple(x, y, t) {
+  ripples.push({x, y, t0: t, r: 0});
+}
+
+canvas.addEventListener('pointerdown', e => {
+  const rect = canvas.getBoundingClientRect();
+  spawnRipple(e.clientX - rect.left, e.clientY - rect.top, performance.now()/1000);
+});
+
+function drawRipples(t) {
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    let r = ripples[i];
+    let age = t - r.t0;
+    if (age > 2.2) { ripples.splice(i, 1); continue; }
+    let rad = age * 180 + 18;
+    let alpha = Math.max(0, 0.25 - age * 0.11);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, rad, 0, Math.PI*2);
+    ctx.strokeStyle = `rgba(120,200,255,${alpha})`;
+    ctx.lineWidth = 2.5 + Math.sin(age*4)*0.7;
+    ctx.shadowColor = '#8cf';
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+let lastAuto = 0;
+function animate(t) {
+  ctx.clearRect(0, 0, w, h);
+  const now = t/1000;
+  drawRipples(now);
+  // Auto-spawn a ripple every 0.7s
+  if (now - lastAuto > 0.7) {
+    spawnRipple(Math.random()*w, Math.random()*h, now);
+    lastAuto = now;
+  }
+  requestAnimationFrame(animate);
+}
+// Initial random ripples
+for (let i = 0; i < 4; i++) {
+  spawnRipple(Math.random()*w, Math.random()*h, performance.now()/1000 - Math.random()*1.5);
+}
+animate(0);
+</script>
+</body>
+</html>

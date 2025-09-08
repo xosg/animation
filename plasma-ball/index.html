@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plasma Ball Animation</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="plasma-canvas"></canvas>
+<script>
+const canvas = document.getElementById('plasma-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+});
+
+const cx = () => w/2, cy = () => h/2;
+const R = () => Math.min(w, h) * 0.22;
+const rays = 9;
+const tips = [];
+for (let i = 0; i < rays; i++) {
+  let a = (i / rays) * Math.PI * 2;
+  tips.push({angle: a, phase: Math.random() * Math.PI * 2});
+}
+
+function drawBall(t) {
+  // Glow
+  let grad = ctx.createRadialGradient(cx(), cy(), 0, cx(), cy(), R());
+  grad.addColorStop(0, '#fff');
+  grad.addColorStop(0.2, '#aaf');
+  grad.addColorStop(0.7, '#44f');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.save();
+  ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  ctx.arc(cx(), cy(), R(), 0, Math.PI*2);
+  ctx.fillStyle = grad;
+  ctx.shadowColor = '#aaf';
+  ctx.shadowBlur = 32;
+  ctx.fill();
+  ctx.restore();
+  // Core
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx(), cy(), R()*0.22, 0, Math.PI*2);
+  ctx.fillStyle = '#fff';
+  ctx.shadowColor = '#fff';
+  ctx.shadowBlur = 16;
+  ctx.globalAlpha = 0.9;
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawRays(t) {
+  for (let i = 0; i < rays; i++) {
+    let tip = tips[i];
+    let a = tip.angle + Math.sin(t*0.7 + tip.phase) * 0.18;
+    let r = R() * (0.7 + 0.18 * Math.sin(t*1.2 + tip.phase));
+    let x1 = cx() + Math.cos(a) * R()*0.22;
+    let y1 = cy() + Math.sin(a) * R()*0.22;
+    let x2 = cx() + Math.cos(a) * r;
+    let y2 = cy() + Math.sin(a) * r;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    // Wavy path
+    for (let j = 1; j <= 7; j++) {
+      let t2 = j/7;
+      let rj = R()*0.22 + (r - R()*0.22) * t2 + Math.sin(t*1.5 + tip.phase + j) * 8 * (1-t2);
+      let xj = cx() + Math.cos(a) * rj + Math.sin(a + t*0.8 + j) * 2 * (1-t2);
+      let yj = cy() + Math.sin(a) * rj + Math.cos(a - t*0.8 - j) * 2 * (1-t2);
+      ctx.lineTo(xj, yj);
+    }
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = `rgba(180,120,255,0.7)`;
+    ctx.lineWidth = 2.2;
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 12;
+    ctx.globalAlpha = 0.8;
+    ctx.stroke();
+    ctx.restore();
+    // Glow at tip
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x2, y2, 7, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(180,120,255,0.18)';
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function animate(t) {
+  ctx.clearRect(0, 0, w, h);
+  drawBall(t/1000);
+  drawRays(t/1000);
+  requestAnimationFrame(animate);
+}
+animate(0);
+</script>
+</body>
+</html>
