@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hyperbolic Tiling</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="tiling-canvas"></canvas>
+<script>
+const canvas = document.getElementById('tiling-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+function drawTiling(time) {
+  ctx.clearRect(0,0,w,h);
+  const cx = w/2, cy = h/2;
+  const R = Math.min(w,h)*0.45;
+  const n = 7, k = 3; // Heptagonal tiling
+  const t = time*0.0002;
+  for(let i=0; i<k*n; i++) {
+    let angle = (i/n)*2*Math.PI + t;
+    let r = R * (0.7 + 0.3*Math.sin(i+t*2));
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    for(let j=0; j<n; j++) {
+      let a = (j/n)*2*Math.PI;
+      let x = r*Math.cos(a), y = r*Math.sin(a);
+      ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = `hsl(${i*360/(k*n)+t*60},100%,70%)`;
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+function animate(time) {
+  drawTiling(time);
+  requestAnimationFrame(animate);
+}
+animate(0);
+window.addEventListener('resize', () => {
+  w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
+});
+</script>
+</body>
+</html>
