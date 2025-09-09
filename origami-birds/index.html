@@ -1,0 +1,182 @@
+<html>
+<head>
+    <title>Origami Birds Effect</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(180deg, #b2cbe4 0%, #6b8ba4 100%);
+            width: 100vw;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<canvas id="birds"></canvas>
+<script>
+const canvas = document.getElementById('birds');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth;
+let h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+function randomGradient() {
+    // Returns a pastel gradient as a CanvasGradient
+    const colorSets = [
+        ['#fbb4ae', '#b3cde3'],
+        ['#ccebc5', '#decbe4'],
+        ['#fed9a6', '#ffffcc'],
+        ['#e5d8bd', '#fddaec'],
+        ['#b2dfdb', '#ffecb3'],
+        ['#f2f2f2', '#b3cde3'],
+        ['#c9e4f6', '#fbb4ae']
+    ];
+    const [c1, c2] = colorSets[Math.floor(Math.random() * colorSets.length)];
+    const grad = ctx.createLinearGradient(0, 0, 30, 18);
+    grad.addColorStop(0, c1);
+    grad.addColorStop(1, c2);
+    return grad;
+}
+
+class Bird {
+    constructor() {
+        this.x = Math.random() * w;
+        this.y = h + 40 + Math.random() * 80;
+        this.size = 18 + Math.random() * 18;
+        this.gradient = randomGradient();
+        this.speed = 1.2 + Math.random() * 1.8;
+        this.angle = Math.random() * Math.PI * 2;
+        this.wing = 0;
+        this.wingSpeed = 0.12 + Math.random() * 0.08;
+        this.targetY = 80 + Math.random() * (h * 0.5);
+        this.alpha = 0;
+        this.fadingIn = true;
+        this.fadingOut = false;
+        this.neighbors = [];
+    }
+    update(birds) {
+        // Flocking: steer towards average position of nearby birds
+        let avgX = 0, avgY = 0, count = 0;
+        for (let b of birds) {
+            let dx = b.x - this.x, dy = b.y - this.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            if (b !== this && dist < 120) {
+                avgX += b.x;
+                avgY += b.y;
+                count++;
+            }
+        }
+        if (count > 0) {
+            avgX /= count; avgY /= count;
+            this.x += (avgX - this.x) * 0.002;
+            this.y += (avgY - this.y) * 0.002;
+        }
+        // Normal movement
+        this.y -= this.speed;
+        this.x += Math.sin(this.angle) * 1.2;
+        this.angle += (Math.random() - 0.5) * 0.04;
+        this.wing += this.wingSpeed;
+        // Fade in/out
+        if (this.fadingIn) {
+            this.alpha += 0.02;
+            if (this.alpha >= 1) { this.alpha = 1; this.fadingIn = false; }
+        } else if (this.fadingOut) {
+            this.alpha -= 0.02;
+        }
+        if (this.y < this.targetY && !this.fadingOut) {
+            this.fadingOut = true;
+        }
+    }
+    draw(ctx) {
+        ctx.save();
+    ctx.globalAlpha = this.alpha * 0.95 + 0.05; // slightly higher opacity
+        ctx.translate(this.x, this.y);
+        ctx.scale(this.size / 30, this.size / 30);
+        ctx.rotate(Math.sin(this.angle) * 0.1);
+        // Glow
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 7;
+        // Body
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(10, -8);
+        ctx.lineTo(18, 0);
+        ctx.lineTo(10, 8);
+        ctx.closePath();
+        ctx.fillStyle = this.gradient;
+        ctx.fill();
+        // Left wing
+        ctx.save();
+        ctx.rotate(-0.7 + Math.sin(this.wing) * 0.7);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-18, -8);
+        ctx.lineTo(-8, 0);
+        ctx.closePath();
+        ctx.fillStyle = this.gradient;
+        ctx.globalAlpha = 0.6;
+        ctx.fill();
+        ctx.restore();
+        // Right wing
+        ctx.save();
+        ctx.rotate(0.7 - Math.sin(this.wing) * 0.7);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-18, 8);
+        ctx.lineTo(-8, 0);
+        ctx.closePath();
+        ctx.fillStyle = this.gradient;
+        ctx.globalAlpha = 0.6;
+        ctx.fill();
+        ctx.restore();
+        ctx.restore();
+    }
+    isAlive() {
+        return this.alpha > 0;
+    }
+}
+
+
+let birds = [];
+function spawnBird() {
+    birds.push(new Bird());
+}
+for (let i = 0; i < 18; i++) spawnBird();
+
+
+function animate() {
+    // Soft dreamy background
+    let grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, '#b2cbe4');
+    grad.addColorStop(1, '#6b8ba4');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    // Animate birds
+    birds.forEach(bird => bird.update(birds));
+    birds = birds.filter(bird => bird.isAlive());
+    birds.forEach(bird => bird.draw(ctx));
+    // Occasionally spawn new birds
+    if (Math.random() < 0.03 && birds.length < 28) spawnBird();
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+});
+
+animate();
+</script>
+</body>
+</html>
