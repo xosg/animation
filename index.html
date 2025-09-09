@@ -26,7 +26,7 @@
     .gallery {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-      gap: 2.4rem 1rem;
+      gap: 2.0rem 1rem;
       margin: 2.5rem auto 3rem auto;
       padding: 0 1.5rem;
     }
@@ -42,9 +42,9 @@
     }
 
     img {
-      width: 7rem;
-      height: 7rem;
-      margin-bottom: 0.7rem;
+      width: 128px;
+      height: 128px;
+      /* margin-bottom: 0.7rem; */
       border-radius: 1rem;
       background: #181c20;
       box-shadow: 0 0 0 2px #222, 0 2px 8px #00eaff22;
@@ -63,8 +63,8 @@
       font-weight: 600;
       text-align: center;
       text-transform: capitalize;
-      margin: 0;
-      letter-spacing: 0.01em;
+      /* margin: 0; */
+      /* letter-spacing: 0.01em; */
       text-shadow: 0 1px 4px #000a;
     }
 
@@ -91,7 +91,7 @@
 
 
   <script>
-  let folders = ['cellular-automata', 'kaleidoscope', 'lens-distortion', 'fireflies', 'magnetic-field-lines', 'particle-swarm', 'dynamic-fractals', 'hex-grid-waves', 'fireworks', 'confetti', 'starfield', 'rain', 'snow', 'bubbles', 'glow-worms', 'wave', 'matrix', 'particle-text', 'spiral', 'nebula', 'electricity', 'black-hole', 'plasma-ball', 'water-ripples', 'fractal-tree', 'vortex', 'dna-helix', 'solar-flare', 'aurora-borealis', 'lightning-storm', 'fractal-zoom', 'magnetic-field', 'lissajous', 'hyperbolic-tiling', 'flocking-boids', 'voronoi-cells', 'turing-patterns', 'starfield-warp', 'moire-patterns', 'metaballs'];
+    let folders = ['cellular-automata', 'kaleidoscope', 'lens-distortion', 'fireflies', 'magnetic-field-lines', 'particle-swarm', 'dynamic-fractals', 'hex-grid-waves', 'fireworks', 'confetti', 'starfield', 'rain', 'snow', 'bubbles', 'glow-worms', 'wave', 'matrix', 'particle-text', 'spiral', 'nebula', 'electricity', 'black-hole', 'plasma-ball', 'water-ripples', 'fractal-tree', 'vortex', 'dna-helix', 'solar-flare', 'aurora-borealis', 'lightning-storm', 'fractal-zoom', 'magnetic-field', 'lissajous', 'hyperbolic-tiling', 'flocking-boids', 'voronoi-cells', 'turing-patterns', 'starfield-warp', 'moire-patterns', 'metaballs'];
 
     const gallery = document.querySelector('.gallery');
     // Dynamically generate gallery items (if needed)
@@ -99,7 +99,7 @@
     folders = folders.map(folder => `
       <div>
         <a href="./${folder}/index.html">
-          <img src="./${folder}/thumbnail.svg" alt="${folder}">
+          <img src="./${folder}/favicon.png" alt="${folder}">
           <h3 class="anim-title">${folder}</h3>
         </a>
       </div>
