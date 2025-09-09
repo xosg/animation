@@ -31,12 +31,12 @@
       padding: 0 1.5rem;
     }
 
-    .gallery-item {
+    .gallery > div {
 
       transition: transform 0.15s, box-shadow 0.15s;
     }
 
-    .gallery-item:hover {
+    .gallery > div:hover {
       transform: translateY(-6px) scale(1.04);
       /* box-shadow: 0 6px 32px #00eaff44, 0 2px 16px #0008; */
     }
@@ -53,7 +53,7 @@
       transition: box-shadow 0.2s;
     }
 
-    .gallery-item:hover .thumb {
+    .gallery > div:hover .thumb {
       box-shadow: 0 0 0 3px #00eaff, 0 2px 16px #00eaff55;
     }
 
@@ -85,114 +85,118 @@
 <body>
   <h1>Web Animation Collection</h1>
   <div class="gallery">
-    <div class="gallery-item"><a href="./fireworks/index.html"><img src="./fireworks/thumbnail.svg" alt="Fireworks"
+    <div><a href="./fireworks/index.html"><img src="./fireworks/thumbnail.svg" alt="Fireworks"
           class="thumb">
         <div class="anim-title">Fireworks</div>
       </a></div>
-    <div class="gallery-item"><a href="./confetti/index.html"><img src="./confetti/thumbnail.svg" alt="Confetti"
+    <div><a href="./confetti/index.html"><img src="./confetti/thumbnail.svg" alt="Confetti"
           class="thumb">
         <div class="anim-title">Confetti</div>
       </a></div>
-    <div class="gallery-item"><a href="./starfield/index.html"><img src="./starfield/thumbnail.svg" alt="Starfield"
+    <div><a href="./starfield/index.html"><img src="./starfield/thumbnail.svg" alt="Starfield"
           class="thumb">
         <div class="anim-title">Starfield</div>
       </a></div>
-    <div class="gallery-item"><a href="./rain/index.html"><img src="./rain/thumbnail.svg" alt="Rain" class="thumb">
+    <div><a href="./rain/index.html"><img src="./rain/thumbnail.svg" alt="Rain" class="thumb">
         <div class="anim-title">Rain</div>
       </a></div>
-    <div class="gallery-item"><a href="./snow/index.html"><img src="./snow/thumbnail.svg" alt="Snow" class="thumb">
+    <div><a href="./snow/index.html"><img src="./snow/thumbnail.svg" alt="Snow" class="thumb">
         <div class="anim-title">Snow</div>
       </a></div>
-    <div class="gallery-item"><a href="./bubbles/index.html"><img src="./bubbles/thumbnail.svg" alt="Bubbles"
+    <div><a href="./bubbles/index.html"><img src="./bubbles/thumbnail.svg" alt="Bubbles"
           class="thumb">
         <div class="anim-title">Bubbles</div>
       </a></div>
-    <div class="gallery-item"><a href="./glow-worms/index.html"><img src="./glow-worms/thumbnail.svg" alt="Glow Worms"
+    <div><a href="./glow-worms/index.html"><img src="./glow-worms/thumbnail.svg" alt="Glow Worms"
           class="thumb">
         <div class="anim-title">Glow Worms</div>
       </a></div>
-    <div class="gallery-item"><a href="./wave/index.html"><img src="./wave/thumbnail.svg" alt="Wave" class="thumb">
+    <div><a href="./wave/index.html"><img src="./wave/thumbnail.svg" alt="Wave" class="thumb">
         <div class="anim-title">Wave</div>
       </a></div>
-    <div class="gallery-item"><a href="./matrix/index.html"><img src="./matrix/thumbnail.svg" alt="Matrix"
+    <div><a href="./matrix/index.html"><img src="./matrix/thumbnail.svg" alt="Matrix"
           class="thumb">
         <div class="anim-title">Matrix</div>
       </a></div>
-    <div class="gallery-item"><a href="./particle-text/index.html"><img src="./particle-text/thumbnail.svg"
+    <div><a href="./particle-text/index.html"><img src="./particle-text/thumbnail.svg"
           alt="Particle Text" class="thumb">
         <div class="anim-title">Particle Text</div>
       </a></div>
-    <div class="gallery-item"><a href="./spiral/index.html"><img src="./spiral/thumbnail.svg" alt="Spiral"
+    <div><a href="./spiral/index.html"><img src="./spiral/thumbnail.svg" alt="Spiral"
           class="thumb">
         <div class="anim-title">Spiral</div>
       </a></div>
-    <div class="gallery-item"><a href="./nebula/index.html"><img src="./nebula/thumbnail.svg" alt="Nebula"
+    <div><a href="./nebula/index.html"><img src="./nebula/thumbnail.svg" alt="Nebula"
           class="thumb">
         <div class="anim-title">Nebula</div>
       </a></div>
-    <div class="gallery-item"><a href="./electricity/index.html"><img src="./electricity/thumbnail.svg"
+    <div><a href="./electricity/index.html"><img src="./electricity/thumbnail.svg"
           alt="Electricity" class="thumb">
         <div class="anim-title">Electricity</div>
       </a></div>
-    <div class="gallery-item"><a href="./black-hole/index.html"><img src="./black-hole/thumbnail.svg" alt="Black Hole"
+    <div><a href="./black-hole/index.html"><img src="./black-hole/thumbnail.svg" alt="Black Hole"
           class="thumb">
         <div class="anim-title">Black Hole</div>
       </a></div>
-    <div class="gallery-item"><a href="./plasma-ball/index.html"><img src="./plasma-ball/thumbnail.svg"
+    <div><a href="./plasma-ball/index.html"><img src="./plasma-ball/thumbnail.svg"
           alt="Plasma Ball" class="thumb">
         <div class="anim-title">Plasma Ball</div>
       </a></div>
-    <div class="gallery-item"><a href="./water-ripples/index.html"><img src="./water-ripples/thumbnail.svg"
+    <div><a href="./water-ripples/index.html"><img src="./water-ripples/thumbnail.svg"
           alt="Water Ripples" class="thumb">
         <div class="anim-title">Water Ripples</div>
       </a></div>
-    <div class="gallery-item"><a href="./fractal-tree/index.html"><img src="./fractal-tree/thumbnail.svg"
+    <div><a href="./fractal-tree/index.html"><img src="./fractal-tree/thumbnail.svg"
           alt="Fractal Tree" class="thumb">
         <div class="anim-title">Fractal Tree</div>
       </a></div>
-    <div class="gallery-item"><a href="./vortex/index.html"><img src="./vortex/thumbnail.svg" alt="Vortex"
+    <div><a href="./vortex/index.html"><img src="./vortex/thumbnail.svg" alt="Vortex"
           class="thumb">
         <div class="anim-title">Vortex</div>
       </a></div>
-    <div class="gallery-item"><a href="./dna-helix/index.html"><img src="./dna-helix/thumbnail.svg" alt="DNA Helix"
+    <div><a href="./dna-helix/index.html"><img src="./dna-helix/thumbnail.svg" alt="DNA Helix"
           class="thumb">
         <div class="anim-title">DNA Helix</div>
       </a></div>
-    <div class="gallery-item"><a href="./solar-flare/index.html"><img src="./solar-flare/thumbnail.svg"
+    <div><a href="./solar-flare/index.html"><img src="./solar-flare/thumbnail.svg"
           alt="Solar Flare" class="thumb">
         <div class="anim-title">Solar Flare</div>
       </a></div>
-    <div class="gallery-item"><a href="./aurora-borealis/index.html"><img src="./aurora-borealis/thumbnail.svg"
+    <div><a href="./aurora-borealis/index.html"><img src="./aurora-borealis/thumbnail.svg"
           alt="Aurora Borealis" class="thumb">
         <div class="anim-title">Aurora Borealis</div>
       </a></div>
-    <div class="gallery-item"><a href="./lightning-storm/index.html"><img src="./lightning-storm/thumbnail.svg"
+    <div><a href="./lightning-storm/index.html"><img src="./lightning-storm/thumbnail.svg"
           alt="Lightning Storm" class="thumb">
         <div class="anim-title">Lightning Storm</div>
       </a></div>
-    <div class="gallery-item"><a href="./fractal-zoom/index.html"><img src="./fractal-zoom/thumbnail.svg"
+    <div><a href="./fractal-zoom/index.html"><img src="./fractal-zoom/thumbnail.svg"
           alt="Fractal Zoom" class="thumb">
         <div class="anim-title">Fractal Zoom</div>
       </a></div>
-    <div class="gallery-item"><a href="./magnetic-field/index.html"><img src="./magnetic-field/thumbnail.svg"
+    <div><a href="./magnetic-field/index.html"><img src="./magnetic-field/thumbnail.svg"
           alt="Magnetic Field" class="thumb">
         <div class="anim-title">Magnetic Field</div>
       </a></div>
-    <div class="gallery-item"><a href="./lissajous/index.html"><img src="./lissajous/thumbnail.svg" alt="Lissajous"
+    <div><a href="./lissajous/index.html"><img src="./lissajous/thumbnail.svg" alt="Lissajous"
           class="thumb">
         <div class="anim-title">Lissajous</div>
       </a></div>
-    <div class="gallery-item"><a href="./hyperbolic-tiling/index.html"><img src="./hyperbolic-tiling/thumbnail.svg"
+    <div><a href="./hyperbolic-tiling/index.html"><img src="./hyperbolic-tiling/thumbnail.svg"
           alt="Hyperbolic Tiling" class="thumb">
         <div class="anim-title">Hyperbolic Tiling</div>
       </a></div>
-    <div class="gallery-item"><a href="./flocking-boids/index.html"><img src="./flocking-boids/thumbnail.svg"
+    <div><a href="./flocking-boids/index.html"><img src="./flocking-boids/thumbnail.svg"
           alt="Flocking Boids" class="thumb">
         <div class="anim-title">Flocking Boids</div>
       </a></div>
-    <div class="gallery-item"><a href="./voronoi-cells/index.html"><img src="./voronoi-cells/thumbnail.svg"
+    <div><a href="./voronoi-cells/index.html"><img src="./voronoi-cells/thumbnail.svg"
           alt="Voronoi Cells" class="thumb">
         <div class="anim-title">Voronoi Cells</div>
+      </a></div>
+    <div><a href="./turing-patterns/index.html"><img src="./turing-patterns/thumbnail.svg"
+          alt="Turing Patterns" class="thumb">
+        <div class="anim-title">Turing Patterns</div>
       </a></div>
   </div>
 </body>

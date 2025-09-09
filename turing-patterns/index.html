@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turing Patterns</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="turing-canvas"></canvas>
+<script>
+const canvas = document.getElementById('turing-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+// Reaction-diffusion (Gray-Scott model)
+const N = 180, M = Math.round(N * h / w);
+let u = [], v = [], u2 = [], v2 = [];
+for(let y=0;y<M;y++){
+  u[y]=[],v[y]=[],u2[y]=[],v2[y]=[];
+  for(let x=0;x<N;x++){
+    u[y][x]=1; v[y][x]=0;
+    // Add random noise for more organic patterns
+    if(Math.random()<0.08) v[y][x]=1;
+    // Central spot for initial pattern
+    if(Math.abs(x-N/2)<8 && Math.abs(y-M/2)<8) v[y][x]=1;
+  }
+}
+function lap(arr,x,y){
+  let s=0;
+  s+=arr[y][x]*-1;
+  if(x>0) s+=arr[y][x-1]*0.2;
+  if(x<N-1) s+=arr[y][x+1]*0.2;
+  if(y>0) s+=arr[y-1][x]*0.2;
+  if(y<M-1) s+=arr[y+1][x]*0.2;
+  if(x>0&&y>0) s+=arr[y-1][x-1]*0.05;
+  if(x<N-1&&y>0) s+=arr[y-1][x+1]*0.05;
+  if(x>0&&y<M-1) s+=arr[y+1][x-1]*0.05;
+  if(x<N-1&&y<M-1) s+=arr[y+1][x+1]*0.05;
+  return s;
+}
+function step() {
+  // Use more dynamic parameters for visible movement
+  for(let y=0;y<M;y++) for(let x=0;x<N;x++){
+    let uvv = u[y][x]*v[y][x]*v[y][x];
+    u2[y][x] = u[y][x] + (0.18*lap(u,x,y) - uvv + 0.045*(1-u[y][x]));
+    v2[y][x] = v[y][x] + (0.09*lap(v,x,y) + uvv - (0.062+0.045)*v[y][x]);
+    u2[y][x] = Math.max(0,Math.min(1,u2[y][x]));
+    v2[y][x] = Math.max(0,Math.min(1,v2[y][x]));
+  }
+  [u,u2]=[u2,u]; [v,v2]=[v2,v];
+}
+function draw() {
+  let img = ctx.createImageData(N, M);
+  for(let y=0;y<M;y++) for(let x=0;x<N;x++){
+    let t = u[y][x]-v[y][x];
+    // Visually appealing color mapping
+    let c = Math.floor(128 + 96 * t);
+    let i = (y*N+x)*4;
+    img.data[i]=c; // R
+    img.data[i+1]=180-c/2; // G
+    img.data[i+2]=255-c; // B
+    img.data[i+3]=255;
+  }
+  // Draw the pattern scaled to fill the canvas
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = N;
+  tempCanvas.height = M;
+  tempCanvas.getContext('2d').putImageData(img, 0, 0);
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(tempCanvas, 0, 0, w, h);
+}
+function animate() {
+  for(let i=0;i<24;i++) step(); // More steps per frame for visible evolution
+  draw();
+  requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize', () => { location.reload(); });
+</script>
+</body>
+</html>
