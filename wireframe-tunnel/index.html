@@ -1,0 +1,136 @@
+<html>
+<head>
+    <title>3D Wireframe Tunnel Effect</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0a0a1a;
+            width: 100vw;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<canvas id="tunnel"></canvas>
+<script>
+const canvas = document.getElementById('tunnel');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth;
+let h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+
+let center = { x: w / 2, y: h / 2 };
+let rings = 48;
+let pointsPerRing = 48;
+let tunnelLength = 1800;
+let t = 0;
+let rotation = 0;
+let mouse = { x: 0, y: 0 };
+let targetRotation = 0;
+let colorShift = 0;
+
+
+function getPoint(r, angle, z, rot) {
+    // Add rotation and parallax
+    angle += rot;
+    const perspective = 700 / (z + 1);
+    // Parallax effect
+    const px = (mouse.x - w / 2) * (1 - z / tunnelLength) * 0.12;
+    const py = (mouse.y - h / 2) * (1 - z / tunnelLength) * 0.12;
+    return {
+        x: center.x + Math.cos(angle) * r * perspective + px,
+        y: center.y + Math.sin(angle) * r * perspective + py
+    };
+}
+
+
+function drawTunnel() {
+    ctx.clearRect(0, 0, w, h);
+    colorShift += 0.5;
+    // Draw rings
+    for (let i = 0; i < rings; i++) {
+        const z = (i * tunnelLength / rings + t) % tunnelLength;
+        const r = 0.18 + 0.38 * (1 - z / tunnelLength);
+        ctx.save();
+        ctx.beginPath();
+        for (let j = 0; j <= pointsPerRing; j++) {
+            const angle = (j / pointsPerRing) * Math.PI * 2 + Math.sin(t * 0.002 + i * 0.1) * 0.13;
+            const p = getPoint(r, angle, z, rotation);
+            if (j === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+        }
+        // Color shifting
+        const hue = (colorShift + i * 8) % 360;
+        ctx.strokeStyle = `hsla(${hue}, 90%, 60%, ${0.18 + 0.82 * (1 - z / tunnelLength)})`;
+        ctx.shadowColor = `hsla(${hue}, 100%, 70%, 1)`;
+        ctx.shadowBlur = 16 + 32 * (1 - z / tunnelLength);
+        ctx.lineWidth = 2.5 + 2 * (1 - z / tunnelLength);
+        ctx.stroke();
+        ctx.restore();
+    }
+    // Draw spokes
+    for (let j = 0; j < pointsPerRing; j++) {
+        ctx.save();
+        ctx.beginPath();
+        for (let i = 0; i < rings - 1; i++) {
+            const z1 = (i * tunnelLength / rings + t) % tunnelLength;
+            const z2 = ((i + 1) * tunnelLength / rings + t) % tunnelLength;
+            const r1 = 0.18 + 0.38 * (1 - z1 / tunnelLength);
+            const r2 = 0.18 + 0.38 * (1 - z2 / tunnelLength);
+            const angle = (j / pointsPerRing) * Math.PI * 2 + Math.sin(t * 0.002 + i * 0.1) * 0.13;
+            const p1 = getPoint(r1, angle, z1, rotation);
+            const p2 = getPoint(r2, angle, z2, rotation);
+            if (i === 0) ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+        }
+        const spokeHue = (colorShift + j * 12) % 360;
+        ctx.strokeStyle = `hsla(${spokeHue}, 100%, 70%, 0.18)`;
+        ctx.shadowColor = `hsla(${spokeHue}, 100%, 80%, 1)`;
+        ctx.shadowBlur = 12;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        ctx.restore();
+    }
+}
+
+
+function animate() {
+    t += 10;
+    // Smoothly interpolate rotation towards targetRotation
+    rotation += (targetRotation - rotation) * 0.08;
+    drawTunnel();
+    requestAnimationFrame(animate);
+}
+
+
+window.addEventListener('resize', () => {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    center = { x: w / 2, y: h / 2 };
+});
+
+canvas.addEventListener('pointermove', e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    // Parallax and rotation
+    const dx = (e.clientX - w / 2) / w;
+    targetRotation = dx * 1.2;
+});
+
+animate();
+</script>
+</body>
+</html>
