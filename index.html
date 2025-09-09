@@ -41,7 +41,7 @@
       /* box-shadow: 0 6px 32px #00eaff44, 0 2px 16px #0008; */
     }
 
-    img.thumb {
+    img {
       width: 7rem;
       height: 7rem;
       margin-bottom: 0.7rem;
@@ -53,7 +53,7 @@
       transition: box-shadow 0.2s;
     }
 
-    .gallery>div:hover .thumb {
+    .gallery>div:hover img {
       box-shadow: 0 0 0 3px #00eaff, 0 2px 16px #00eaff55;
     }
 
@@ -91,7 +91,7 @@
 
 
   <script>
-    let folders = ['particle-swarm','dynamic-fractals','hex-grid-waves', 'fireworks', 'confetti', 'starfield', 'rain', 'snow', 'bubbles', 'glow-worms', 'wave', 'matrix', 'particle-text', 'spiral', 'nebula', 'electricity', 'black-hole', 'plasma-ball', 'water-ripples', 'fractal-tree', 'vortex', 'dna-helix', 'solar-flare', 'aurora-borealis', 'lightning-storm', 'fractal-zoom', 'magnetic-field', 'lissajous', 'hyperbolic-tiling', 'flocking-boids', 'voronoi-cells', 'turing-patterns', 'starfield-warp', 'moire-patterns'
+    let folders = ['fireflies', 'magnetic-field-lines', 'particle-swarm', 'dynamic-fractals', 'hex-grid-waves', 'fireworks', 'confetti', 'starfield', 'rain', 'snow', 'bubbles', 'glow-worms', 'wave', 'matrix', 'particle-text', 'spiral', 'nebula', 'electricity', 'black-hole', 'plasma-ball', 'water-ripples', 'fractal-tree', 'vortex', 'dna-helix', 'solar-flare', 'aurora-borealis', 'lightning-storm', 'fractal-zoom', 'magnetic-field', 'lissajous', 'hyperbolic-tiling', 'flocking-boids', 'voronoi-cells', 'turing-patterns', 'starfield-warp', 'moire-patterns'
     ];
 
     const gallery = document.querySelector('.gallery');
@@ -100,7 +100,7 @@
     folders = folders.map(folder => `
       <div>
         <a href="./${folder}/index.html">
-          <img src="./${folder}/thumbnail.svg" alt="${folder}" class="thumb">
+          <img src="./${folder}/thumbnail.svg" alt="${folder}">
           <h3 class="anim-title">${folder}</h3>
         </a>
       </div>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magnetic Field Lines</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="field-canvas"></canvas>
+<script>
+const canvas = document.getElementById('field-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const poles = [
+  {x: w*0.35, y: h*0.5, strength: 1, color: '#3cf'},
+  {x: w*0.65, y: h*0.5, strength: -1, color: '#fff'}
+];
+
+function fieldAt(x, y) {
+  let fx = 0, fy = 0;
+  for(const p of poles) {
+    let dx = x-p.x, dy = y-p.y;
+    let r2 = dx*dx+dy*dy+24;
+    let f = p.strength/r2;
+    fx += f*dx;
+    fy += f*dy;
+  }
+  return [fx, fy];
+}
+
+function drawFieldLines(time) {
+  ctx.clearRect(0,0,w,h);
+  // Draw poles
+  for(const p of poles) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 18, 0, 2*Math.PI);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = 0.13;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 16;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+  // Draw field lines
+  for(let a=0; a<Math.PI*2; a+=Math.PI/16) {
+    let x = poles[0].x + Math.cos(a)*22;
+    let y = poles[0].y + Math.sin(a)*22;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    let alpha = 1;
+    for(let i=0;i<120;i++) {
+      let [fx, fy] = fieldAt(x, y);
+      let mag = Math.sqrt(fx*fx+fy*fy)+0.001;
+      fx /= mag; fy /= mag;
+      x += fx*6; y += fy*6;
+      ctx.lineTo(x, y);
+      alpha *= 0.992;
+      if(x<0||x>w||y<0||y>h) break;
+    }
+    ctx.strokeStyle = `rgba(61,207,255,${0.18+0.18*Math.sin(a+time*0.0007)})`;
+    ctx.lineWidth = 2.2;
+    ctx.shadowColor = '#3cf';
+    ctx.shadowBlur = 8;
+    ctx.globalAlpha = alpha;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+}
+function animate(time) {
+  drawFieldLines(time);
+  requestAnimationFrame(animate);
+}
+animate(0);
+window.addEventListener('resize', () => {
+  w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
+  poles[0].x = w*0.35; poles[0].y = h*0.5;
+  poles[1].x = w*0.65; poles[1].y = h*0.5;
+});
+</script>
+</body>
+</html>
