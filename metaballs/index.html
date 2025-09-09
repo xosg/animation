@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metaballs</title>
+  <style>
+  html, body { height: 100%; width: 100%; margin: 0; padding: 0; background: #181c20; }
+  body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; }
+  canvas { background: #181c20; display: block; width: 100vw; height: 100vh; box-shadow: none; border-radius: 0; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Metaball parameters
+    const NUM_BALLS = 7;
+    const balls = [];
+    for (let i = 0; i < NUM_BALLS; i++) {
+      balls.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 60 + Math.random() * 40,
+        vx: (Math.random() - 0.5) * 2.5,
+        vy: (Math.random() - 0.5) * 2.5,
+        color: `hsl(${Math.random()*360}, 80%, 60%)`
+      });
+    }
+
+    function metaballField(x, y) {
+      let sum = 0;
+      for (const b of balls) {
+        const dx = x - b.x;
+        const dy = y - b.y;
+        sum += (b.r * b.r) / (dx*dx + dy*dy + 1);
+      }
+      return sum;
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      // Draw metaballs using marching squares
+      const step = 4;
+      const threshold = 1.0;
+      for (let y = 0; y < h; y += step) {
+        for (let x = 0; x < w; x += step) {
+          let v = metaballField(x, y);
+          if (v > threshold) {
+            // Color blend based on closest ball
+            let minDist = 1e9, color = '#fff';
+            for (const b of balls) {
+              const dx = x - b.x, dy = y - b.y, d = dx*dx + dy*dy;
+              if (d < minDist) { minDist = d; color = b.color; }
+            }
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, step, step);
+          }
+        }
+      }
+      // Animate balls
+      for (const b of balls) {
+        b.x += b.vx;
+        b.y += b.vy;
+        if (b.x < b.r || b.x > w - b.r) b.vx *= -1;
+        if (b.y < b.r || b.y > h - b.r) b.vy *= -1;
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
