@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cellular Automata</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="ca-canvas"></canvas>
+<script>
+const canvas = document.getElementById('ca-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const CELL_SIZE = 4;
+const COLS = Math.floor(w / CELL_SIZE);
+const ROWS = Math.floor(h / CELL_SIZE);
+let grid = [], next = [];
+for(let y=0;y<ROWS;y++){
+  grid[y]=[]; next[y]=[];
+  for(let x=0;x<COLS;x++){
+    grid[y][x] = Math.random()<0.18 ? 1 : 0;
+    next[y][x] = 0;
+  }
+}
+function countNeighbors(x, y) {
+  let sum = 0;
+  for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++) {
+    if(dx===0&&dy===0) continue;
+    let nx = (x+dx+COLS)%COLS, ny = (y+dy+ROWS)%ROWS;
+    sum += grid[ny][nx];
+  }
+  return sum;
+}
+function step() {
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    let n = countNeighbors(x,y);
+    if(grid[y][x]) next[y][x] = n===2||n===3 ? 1 : 0;
+    else next[y][x] = n===3 ? 1 : 0;
+  }
+  [grid,next]=[next,grid];
+}
+function draw() {
+  ctx.clearRect(0,0,w,h);
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    if(grid[y][x]) {
+      ctx.fillStyle = `hsl(${180+y*2},100%,${60+x%40}%)`;
+      ctx.fillRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+  }
+}
+function animate() {
+  for(let i=0;i<2;i++) step();
+  draw();
+  requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize', () => { location.reload(); });
+</script>
+</body>
+</html>
