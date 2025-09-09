@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaotic Attractor</title>
+  <style>
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; background: #181c20; }
+    body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; }
+    canvas { background: #181c20; display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    // Chaotic attractor (De Jong)
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // De Jong attractor parameters
+    let a = 2.01, b = -2.53, c = 1.61, d = -0.33;
+    function randomizeParams() {
+      a = 1.5 + Math.random()*2.5;
+      b = -3 + Math.random()*6;
+      c = 1.5 + Math.random()*2.5;
+      d = -3 + Math.random()*6;
+    }
+    setInterval(randomizeParams, 12000);
+
+    // Particle system
+  const NUM_PARTICLES = 180;
+    let points = [];
+    function resetPoints() {
+      points = [];
+      for (let i = 0; i < NUM_PARTICLES; i++) {
+        points.push({
+          x: (Math.random()-0.5)*2,
+          y: (Math.random()-0.5)*2,
+          hue: 180 + 120 * Math.sin(i/NUM_PARTICLES * Math.PI)
+        });
+      }
+    }
+    resetPoints();
+    setInterval(resetPoints, 12000);
+
+    let t = 0;
+    function draw() {
+  ctx.globalAlpha = 0.04;
+      ctx.fillStyle = '#181c20';
+      ctx.fillRect(0, 0, w, h);
+  ctx.globalAlpha = 0.18;
+      ctx.save();
+      ctx.translate(w/2, h/2);
+  ctx.scale(Math.min(w, h)*0.07, Math.min(w, h)*0.07);
+      for (const p of points) {
+        // De Jong equations
+        let nx = Math.sin(a * p.y) - Math.cos(b * p.x);
+        let ny = Math.sin(c * p.x) - Math.cos(d * p.y);
+        // Use a random pastel color for each particle
+        ctx.strokeStyle = `hsl(${(p.hue + t*20 + Math.sin(p.x*7+p.y*11)*60)%360}, 80%, 70%)`;
+        ctx.lineWidth = 0.07;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(
+          p.x + (nx - p.x) * 2.2,
+          p.y + (ny - p.y) * 2.2
+        );
+        ctx.stroke();
+        p.x = nx;
+        p.y = ny;
+      }
+      ctx.restore();
+      t += 0.008;
+      requestAnimationFrame(draw);
+    }
+    draw();
+  </script>
+</body>
+</html>
