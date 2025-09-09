@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorful Reaction-Diffusion Waves</title>
+  <style>
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; background: #181c20; }
+    body { width: 100vw; height: 100vh; margin: 0; padding: 0; overflow: hidden; }
+    canvas { background: #181c20; display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    // Colorful reaction-diffusion waves (multi-channel)
+    const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    let w, h;
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Simulation grid
+    const scale = 2;
+    let gw = Math.floor(w/scale), gh = Math.floor(h/scale);
+    let A = [], B = [], C = [], tmpA = [], tmpB = [], tmpC = [];
+    function initGrid() {
+      gw = Math.floor(w/scale);
+      gh = Math.floor(h/scale);
+      A = new Float32Array(gw*gh);
+      B = new Float32Array(gw*gh);
+      C = new Float32Array(gw*gh);
+      tmpA = new Float32Array(gw*gh);
+      tmpB = new Float32Array(gw*gh);
+      tmpC = new Float32Array(gw*gh);
+      for (let i = 0; i < gw*gh; i++) {
+        A[i] = Math.random()*0.2;
+        B[i] = Math.random()*0.2;
+        C[i] = Math.random()*0.2;
+      }
+      // Seed a few spots
+      for (let n = 0; n < 8; n++) {
+        let cx = Math.floor(Math.random()*gw), cy = Math.floor(Math.random()*gh);
+        for (let y = -6; y <= 6; y++) for (let x = -6; x <= 6; x++) {
+          let ix = (cy+y)*gw + (cx+x);
+          if (ix >= 0 && ix < gw*gh) {
+            A[ix] = 1.0;
+            B[ix] = 0.0;
+            C[ix] = 0.0;
+          }
+        }
+      }
+    }
+    initGrid();
+    window.addEventListener('resize', initGrid);
+
+    // Laplacian helper
+    function lap(arr, x, y) {
+      let v = 0;
+      let idx = (y*gw + x);
+      v += arr[idx]*-1;
+      v += arr[((y+1+gh)%gh)*gw + x]*0.2;
+      v += arr[((y-1+gh)%gh)*gw + x]*0.2;
+      v += arr[y*gw + (x+1+gw)%gw]*0.2;
+      v += arr[y*gw + (x-1+gw)%gw]*0.2;
+      v += arr[((y+1+gh)%gh)*gw + (x+1+gw)%gw]*0.05;
+      v += arr[((y-1+gh)%gh)*gw + (x+1+gw)%gw]*0.05;
+      v += arr[((y+1+gh)%gh)*gw + (x-1+gw)%gw]*0.05;
+      v += arr[((y-1+gh)%gh)*gw + (x-1+gw)%gw]*0.05;
+      return v;
+    }
+
+    // Update step
+    function step() {
+      for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) {
+        let i = y*gw + x;
+        let a = A[i], b = B[i], c = C[i];
+        let la = lap(A, x, y), lb = lap(B, x, y), lc = lap(C, x, y);
+        // Multi-channel Gray-Scott-like
+        let feed = 0.035, kill = 0.065;
+        let dA = 1.0, dB = 0.5, dC = 0.7;
+        let reacAB = a*b*b;
+        let reacBC = b*c*c;
+        let reacCA = c*a*a;
+        tmpA[i] = a + (dA*la - reacAB + reacCA + feed*(1-a) - kill*a)*0.95;
+        tmpB[i] = b + (dB*lb + reacAB - reacBC + feed*(1-b) - kill*b)*0.95;
+        tmpC[i] = c + (dC*lc + reacBC - reacCA + feed*(1-c) - kill*c)*0.95;
+      }
+      // Swap
+      [A, tmpA] = [tmpA, A];
+      [B, tmpB] = [tmpB, B];
+      [C, tmpC] = [tmpC, C];
+    }
+
+    // Draw
+    function draw() {
+      for (let k = 0; k < 6; k++) step();
+      let img = ctx.getImageData(0, 0, w, h);
+      let data = img.data;
+      for (let y = 0; y < h; y += scale) for (let x = 0; x < w; x += scale) {
+        let gx = Math.floor(x/scale), gy = Math.floor(y/scale);
+        let i = gy*gw + gx;
+        let r = Math.floor(180 + 60*A[i] - 40*B[i] + 80*C[i]);
+        let g = Math.floor(120 + 120*B[i] + 40*A[i]);
+        let b = Math.floor(180 + 80*C[i] + 40*B[i] - 60*A[i]);
+        let idx = (y*w + x)*4;
+        for (let dy = 0; dy < scale; dy++) for (let dx = 0; dx < scale; dx++) {
+          let ii = idx + (dy*w + dx)*4;
+          data[ii+0] = r;
+          data[ii+1] = g;
+          data[ii+2] = b;
+          data[ii+3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      requestAnimationFrame(draw);
+    }
+    draw();
+  </script>
+</body>
+</html>
