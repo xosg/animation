@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starfield Warp</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="starfield-canvas"></canvas>
+<script>
+const canvas = document.getElementById('starfield-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const NUM_STARS = 420;
+const stars = [];
+function resetStar(s) {
+  s.x = (Math.random()-0.5)*w*0.7;
+  s.y = (Math.random()-0.5)*h*0.7;
+  s.z = Math.random()*w*0.5 + 0.2*w;
+  s.pz = s.z;
+  s.color = `hsl(${200+Math.random()*60},100%,${60+Math.random()*30}%)`;
+}
+for(let i=0;i<NUM_STARS;i++) {
+  let s = {};
+  resetStar(s);
+  stars.push(s);
+}
+function drawStarfield() {
+  ctx.clearRect(0,0,w,h);
+  ctx.save();
+  ctx.translate(w/2, h/2);
+  for(const s of stars) {
+    let sx = s.x/s.z*w*0.5;
+    let sy = s.y/s.z*h*0.5;
+    let px = s.x/s.pz*w*0.5;
+    let py = s.y/s.pz*h*0.5;
+    s.pz = s.z;
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(sx, sy);
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = Math.max(0.5, 2.5-s.z/w*2);
+    ctx.shadowColor = s.color;
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(sx, sy, Math.max(0.7, 2.5-s.z/w*2), 0, 2*Math.PI);
+    ctx.fillStyle = s.color;
+    ctx.globalAlpha = 0.7;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    s.z -= 8;
+    if(s.z<8) resetStar(s);
+  }
+  ctx.restore();
+}
+function animate() {
+  drawStarfield();
+  requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize', () => {
+  w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
+});
+</script>
+</body>
+</html>
