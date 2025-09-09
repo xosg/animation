@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flocking Boids</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="boids-canvas"></canvas>
+<script>
+const canvas = document.getElementById('boids-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const NUM_BOIDS = 60;
+const boids = [];
+for(let i=0;i<NUM_BOIDS;i++) {
+  boids.push({
+    x: Math.random()*w,
+    y: Math.random()*h,
+    vx: Math.random()*2-1,
+    vy: Math.random()*2-1,
+    color: `hsl(${Math.random()*360},100%,70%)`
+  });
+}
+
+function distance(a, b) {
+  let dx = a.x-b.x, dy = a.y-b.y;
+  return Math.sqrt(dx*dx+dy*dy);
+}
+
+function updateBoids() {
+  for(let i=0;i<NUM_BOIDS;i++) {
+    let b = boids[i];
+    let v1x=0,v1y=0,v2x=0,v2y=0,v3x=0,v3y=0, count1=0, count2=0;
+    for(let j=0;j<NUM_BOIDS;j++) {
+      if(i===j) continue;
+      let other = boids[j];
+      let d = distance(b, other);
+      if(d<60) { // Cohesion
+        v1x += other.x; v1y += other.y; count1++;
+      }
+      if(d<30) { // Separation
+        v2x -= (other.x-b.x); v2y -= (other.y-b.y); count2++;
+      }
+      if(d<80) { // Alignment
+        v3x += other.vx; v3y += other.vy;
+      }
+    }
+    if(count1>0) {
+      v1x = (v1x/count1-b.x)*0.005;
+      v1y = (v1y/count1-b.y)*0.005;
+    }
+    if(count2>0) {
+      v2x *= 0.03; v2y *= 0.03;
+    }
+    v3x = (v3x/NUM_BOIDS-b.vx)*0.05;
+    v3y = (v3y/NUM_BOIDS-b.vy)*0.05;
+    b.vx += v1x+v2x+v3x;
+    b.vy += v1y+v2y+v3y;
+    let speed = Math.sqrt(b.vx*b.vx+b.vy*b.vy);
+    if(speed>3) { b.vx*=2.5/speed; b.vy*=2.5/speed; }
+    b.x += b.vx; b.y += b.vy;
+    if(b.x<0) b.x+=w; if(b.x>w) b.x-=w;
+    if(b.y<0) b.y+=h; if(b.y>h) b.y-=h;
+  }
+}
+
+function drawBoids() {
+  ctx.clearRect(0,0,w,h);
+  for(const b of boids) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(Math.atan2(b.vy, b.vx));
+    ctx.beginPath();
+    ctx.moveTo(12,0);
+    ctx.lineTo(-8,5);
+    ctx.lineTo(-8,-5);
+    ctx.closePath();
+    ctx.fillStyle = b.color;
+    ctx.shadowColor = b.color;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function animate() {
+  updateBoids();
+  drawBoids();
+  requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize', () => {
+  w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
+});
+</script>
+</body>
+</html>
