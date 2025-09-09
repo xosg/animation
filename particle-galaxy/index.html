@@ -1,0 +1,92 @@
+<html></html>
+<head>
+    <title>Particle Galaxy Effect</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0a0a1a;
+            width: 100vw;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<canvas id="galaxy"></canvas>
+<script>
+const canvas = document.getElementById('galaxy');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth;
+let h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const center = { x: w / 2, y: h / 2 };
+const numParticles = 800;
+const arms = 4;
+const particles = [];
+
+function randomColor() {
+    const colors = [
+        '#fff', '#ffeedd', '#aaffff', '#ffccff', '#aaffcc', '#ffddee', '#ccffff', '#ffffcc'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+for (let i = 0; i < numParticles; i++) {
+    const arm = i % arms;
+    const angle = (arm / arms) * Math.PI * 2 + Math.random() * 0.2;
+    const radius = Math.random() * (Math.min(w, h) * 0.45);
+    const speed = 0.0005 + Math.random() * 0.0015;
+    particles.push({
+        baseAngle: angle,
+        angle: angle,
+        radius: radius,
+        speed: speed,
+        size: 1 + Math.random() * 2,
+        color: randomColor(),
+        offset: Math.random() * Math.PI * 2
+    });
+}
+
+function drawGalaxy(t) {
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.angle = p.baseAngle + t * p.speed + Math.sin(t * 0.0002 + p.offset) * 0.2;
+        const x = center.x + Math.cos(p.angle) * p.radius;
+        const y = center.y + Math.sin(p.angle) * p.radius * (0.7 + 0.3 * Math.sin(t * 0.0001 + p.offset));
+        ctx.beginPath();
+        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.7;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+        ctx.shadowBlur = 0;
+    }
+    requestAnimationFrame(drawGalaxy);
+}
+
+window.addEventListener('resize', () => {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    center.x = w / 2;
+    center.y = h / 2;
+});
+
+drawGalaxy(0);
+</script>
+</body>
+</html>
