@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Swarm</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="swarm-canvas"></canvas>
+<script>
+const canvas = document.getElementById('swarm-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const NUM_PARTICLES = 180;
+const particles = [];
+const attractors = [
+  {x: w*0.3, y: h*0.4, color: '#3cf'},
+  {x: w*0.7, y: h*0.6, color: '#fff'}
+];
+for(let i=0;i<NUM_PARTICLES;i++) {
+  particles.push({
+    x: Math.random()*w,
+    y: Math.random()*h,
+    vx: 0, vy: 0,
+    color: `hsl(${180+Math.random()*120},100%,70%)`,
+    size: 2+Math.random()*2
+  });
+}
+function updateParticles(time) {
+  for(let i=0; i<particles.length; i++) {
+    const p = particles[i];
+    let ax=0, ay=0;
+    // Attractor forces
+    for(const a of attractors) {
+      let dx = a.x-p.x, dy = a.y-p.y;
+      let dist = Math.sqrt(dx*dx+dy*dy)+1;
+      let force = 0.7/dist;
+      ax += force*dx;
+      ay += force*dy;
+    }
+    // Repulsion from other particles
+    for(let j=0; j<particles.length; j++) {
+      if(i===j) continue;
+      let op = particles[j];
+      let dx = p.x-op.x, dy = p.y-op.y;
+      let dist2 = dx*dx+dy*dy;
+      if(dist2 < 900 && dist2 > 1) { // 30px radius
+        let rep = 0.7/dist2;
+        ax += rep*dx;
+        ay += rep*dy;
+      }
+    }
+    p.vx += ax*0.01;
+    p.vy += ay*0.01;
+    p.vx *= 0.96;
+    p.vy *= 0.96;
+    p.x += p.vx;
+    p.y += p.vy;
+    if(p.x<0) p.x+=w; if(p.x>w) p.x-=w;
+    if(p.y<0) p.y+=h; if(p.y>h) p.y-=h;
+  }
+  // Move attractors
+  attractors[0].x = w*0.3 + Math.sin(time*0.0007)*w*0.18;
+  attractors[0].y = h*0.4 + Math.cos(time*0.0005)*h*0.13;
+  attractors[1].x = w*0.7 + Math.cos(time*0.0006)*w*0.18;
+  attractors[1].y = h*0.6 + Math.sin(time*0.0008)*h*0.13;
+}
+function drawParticles() {
+  ctx.clearRect(0,0,w,h);
+  for(const a of attractors) {
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, 18, 0, 2*Math.PI);
+    ctx.fillStyle = a.color;
+    ctx.globalAlpha = 0.13;
+    ctx.shadowColor = a.color;
+    ctx.shadowBlur = 16;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+  for(const p of particles) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, 2*Math.PI);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = 0.7;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 8;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+}
+function animate(time) {
+  updateParticles(time);
+  drawParticles();
+  requestAnimationFrame(animate);
+}
+animate(0);
+window.addEventListener('resize', () => {
+  w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
+  attractors[0].x = w*0.3; attractors[0].y = h*0.4;
+  attractors[1].x = w*0.7; attractors[1].y = h*0.6;
+});
+</script>
+</body>
+</html>

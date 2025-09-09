@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Fractals</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181c20; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="fractal-canvas"></canvas>
+<script>
+const canvas = document.getElementById('fractal-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+function drawFractal(time) {
+  let zoom = 1.5 + Math.sin(time*0.0002)*1.2;
+  let moveX = Math.sin(time*0.00013)*0.5;
+  let moveY = Math.cos(time*0.00017)*0.5;
+  let maxIter = 60;
+  let img = ctx.createImageData(w, h);
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    let zx = 1.5*(x-w/2)/(0.5*zoom*w) + moveX;
+    let zy = (y-h/2)/(0.5*zoom*h) + moveY;
+    let cX = -0.7 + Math.sin(time*0.0001)*0.3;
+    let cY = 0.27015 + Math.cos(time*0.00012)*0.3;
+    let i = maxIter;
+    while(zx*zx+zy*zy<4 && i>0) {
+      let tmp = zx*zx-zy*zy + cX;
+      zy = 2.0*zx*zy + cY;
+      zx = tmp;
+      i--;
+    }
+    let p = (y*w+x)*4;
+    let c = i===0 ? 0 : 255-Math.floor(255*i/maxIter);
+    img.data[p] = c;
+    img.data[p+1] = 128+c*0.5;
+    img.data[p+2] = 255-c;
+    img.data[p+3] = 255;
+  }
+  ctx.putImageData(img,0,0);
+}
+function animate(time) {
+  drawFractal(time);
+  requestAnimationFrame(animate);
+}
+animate(0);
+window.addEventListener('resize', () => {
+  w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h;
+});
+</script>
+</body>
+</html>
