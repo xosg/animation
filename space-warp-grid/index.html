@@ -1,0 +1,108 @@
+<html>
+<head>
+    <title>Space Warp Grid Effect</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0a0a1a;
+            width: 100vw;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<canvas id="warpgrid"></canvas>
+<script>
+const canvas = document.getElementById('warpgrid');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth;
+let h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const cols = 32;
+const rows = 18;
+const grid = [];
+const center = { x: w/2, y: h/2 };
+
+function initGrid() {
+    grid.length = 0;
+    for (let y = 0; y < rows; y++) {
+        let row = [];
+        for (let x = 0; x < cols; x++) {
+            row.push({
+                ox: x / (cols-1) * w,
+                oy: y / (rows-1) * h,
+                x: x / (cols-1) * w,
+                y: y / (rows-1) * h
+            });
+        }
+        grid.push(row);
+    }
+}
+initGrid();
+
+function animate(t) {
+    ctx.clearRect(0, 0, w, h);
+    // Warp grid
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            let p = grid[y][x];
+            let dx = p.ox - center.x;
+            let dy = p.oy - center.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            let angle = Math.atan2(dy, dx);
+            let warp = Math.sin(t*0.001 + dist*0.018) * 32 + Math.cos(t*0.0007 + angle*2) * 18;
+            p.x = p.ox + Math.cos(angle) * warp;
+            p.y = p.oy + Math.sin(angle) * warp;
+        }
+    }
+    // Draw grid lines
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,255,200,0.18)';
+    ctx.lineWidth = 1.2;
+    for (let y = 0; y < rows; y++) {
+        ctx.beginPath();
+        for (let x = 0; x < cols; x++) {
+            let p = grid[y][x];
+            if (x === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+    }
+    for (let x = 0; x < cols; x++) {
+        ctx.beginPath();
+        for (let y = 0; y < rows; y++) {
+            let p = grid[y][x];
+            if (y === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+    }
+    ctx.restore();
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    center.x = w/2;
+    center.y = h/2;
+    initGrid();
+});
+
+animate(0);
+</script>
+</body>
+</html>
