@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Spiral Effect</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #181a24; overflow: hidden; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+<canvas id="spiral-canvas"></canvas>
+<script>
+const canvas = document.getElementById('spiral-canvas');
+const ctx = canvas.getContext('2d');
+let w = window.innerWidth, h = window.innerHeight;
+canvas.width = w;
+canvas.height = h;
+
+const CENTER = { x: w/2, y: h/2 };
+const PARTICLE_COUNT = 420;
+const particles = [];
+
+function randomColor() {
+  return `hsl(${180 + Math.random()*120}, 80%, 70%)`;
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  let t = i / PARTICLE_COUNT;
+  let angle = t * Math.PI * 16;
+  let radius = t * (Math.min(w, h) * 0.45);
+  particles.push({
+    baseRadius: radius,
+    angle: angle,
+    speed: 0.012 + Math.random() * 0.012,
+    spiral: 0.18 + Math.random() * 0.18,
+    size: 2.1 + Math.random() * 2.1,
+    color: randomColor(),
+    alpha: 0.7 + Math.random() * 0.3,
+    phase: Math.random() * Math.PI * 2
+  });
+}
+
+function animate() {
+  ctx.clearRect(0, 0, w, h);
+  // Spiral glow
+  let grad = ctx.createRadialGradient(CENTER.x, CENTER.y, 0, CENTER.x, CENTER.y, Math.min(w, h)*0.48);
+  grad.addColorStop(0, 'rgba(200,255,255,0.10)');
+  grad.addColorStop(1, 'rgba(24,26,36,0.0)');
+  ctx.beginPath();
+  ctx.arc(CENTER.x, CENTER.y, Math.min(w, h)*0.48, 0, Math.PI*2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  for (let p of particles) {
+    p.angle += p.speed * (0.7 + Math.sin(Date.now()*0.0003 + p.phase)*0.5);
+    let spiralRadius = p.baseRadius + Math.sin(Date.now()*0.001 + p.phase) * 18;
+    let x = CENTER.x + Math.cos(p.angle) * spiralRadius;
+    let y = CENTER.y + Math.sin(p.angle) * spiralRadius;
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.beginPath();
+    ctx.arc(x, y, p.size, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.restore();
+  }
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+  w = window.innerWidth;
+  h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+  CENTER.x = w/2;
+  CENTER.y = h/2;
+});
+
+animate();
+</script>
+</body>
+</html>
